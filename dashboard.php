@@ -141,7 +141,7 @@ $first_name = htmlspecialchars($_SESSION["first_name"]);
 
     <div class="sidebar">
         <div class="sidebar-header">
-            SIS Portal
+            SIS Portal Team Villegas
         </div>
         <ul class="sidebar-nav">
             <li>
