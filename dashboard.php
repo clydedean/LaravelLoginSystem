@@ -187,7 +187,7 @@ $first_name = htmlspecialchars($_SESSION["first_name"]);
 
         <div class="welcome-card">
             <h2>Welcome back, <?php echo $first_name; ?>!</h2>
-            <p>This is your student dashboard. As requested, the links in the sidebar don't lead anywhere yet, except for the functional logout button.</p>
+            <p>Hi everyone!This is our student dashboard. The links in the sidebar don't lead anywhere yet, except for the functional logout button.</p>
             <p>You can manage your student information, check your grades, and view subject details here once the full system is built.</p>
         </div>
     </div>
