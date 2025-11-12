@@ -4,6 +4,7 @@ session_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +29,7 @@ session_start();
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
             width: 100%;
-            max-width: 450px;
+            max-width: 900px;
             box-sizing: border-box;
             margin: 2rem 0;
         }
@@ -39,7 +40,7 @@ session_start();
         }
 
         .logo-container img {
-            max-width: 100px; /* Adjust max-width as needed */
+            max-width: 100px;
             height: auto;
         }
 
@@ -56,8 +57,19 @@ session_start();
             margin-bottom: 2rem;
         }
 
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
         .form-group {
             margin-bottom: 1.25rem;
+        }
+
+        .form-group-full {
+            grid-column: 1 / -1;
         }
 
         .form-group label {
@@ -72,7 +84,7 @@ session_start();
             padding: 0.75rem;
             border: 1px solid #ddd;
             border-radius: 8px;
-            box-sizing: border-box; /* Important for padding to work correctly */
+            box-sizing: border-box;
             font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
             transition: border-color 0.3s, box-shadow 0.3s;
@@ -95,6 +107,7 @@ session_start();
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.3s, transform 0.3s;
+            margin-top: 1rem;
         }
 
         .btn:hover {
@@ -135,13 +148,25 @@ session_start();
             margin: 0;
             padding-left: 1.2rem;
         }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .container {
+                max-width: 450px;
+            }
+        }
     </style>
 </head>
+
 <body>
 
     <div class="container">
         <div class="logo-container">
-            <!-- IMPORTANT: Change 'logo.png' to your actual logo filename -->
             <img src="images/logo.png" alt="School Logo">
         </div>
         <h1>Create Account</h1>
@@ -158,41 +183,53 @@ session_start();
             }
             echo '</ul>';
             echo '</div>';
-            
+
             // Clear the errors from the session
             unset($_SESSION['errors']);
         }
         ?>
 
         <form action="signup_process.php" method="POST" novalidate>
-            <div class="form-group">
-                <label for="student_id">Student ID Number</label>
-                <input type="text" id="student_id" name="student_id" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="student_id">Student ID Number</label>
+                    <input type="text" id="student_id" name="student_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" required>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="first_name">First Name</label>
-                <input type="text" id="first_name" name="first_name" required>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" required>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="last_name">Last Name</label>
-                <input type="text" id="last_name" name="last_name" required>
+
+            <div class="form-row">
+                <div class="form-group form-group-full">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" name="address">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="age">Age</label>
-                <input type="number" id="age" name="age" required>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="address">Address</label>
-                <input type="text" id="address" name="address">
-            </div>
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
+
             <button type="submit" class="btn">Sign Up</button>
         </form>
 
@@ -202,4 +239,5 @@ session_start();
     </div>
 
 </body>
+
 </html>
