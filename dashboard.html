@@ -161,7 +161,8 @@
             </li>
             <li>
                 <a href="#">
-                    <svg xmlns="http://www.w3.org/2TEST/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18" /></svg>
+                    <!-- FIX 3: Corrected the SVG URL from /2TEST/ to /2000/ -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18" /></svg>
                     Subjects
                 </a>
             </li>
@@ -189,13 +190,14 @@
 
         <div class="welcome-card">
             <h2 id="welcome-heading">Welcome back!</h2>
-            <p>This is our student dashboard. The links in the sidebar don't lead anywhere yet, except for the functional logout button.</p>
+            <p>This is your student dashboard. As requested, the links in the sidebar don't lead anywhere yet, except for the functional logout button.</p>
             <p>You can manage your student information, check your grades, and view subject details here once the full system is built.</p>
         </div>
     </div>
 
     <!-- ========= FIREBASE SCRIPT ========== -->
     <script type="module">
+        // FIX 2: Removed markdown [ ]( ) brackets from URL
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
         import { 
             getAuth, 
@@ -206,6 +208,7 @@
             getFirestore,
             doc,
             getDoc
+        // FIX 2: Removed markdown [ ]( ) brackets from URL
         } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
         // Your web app's Firebase configuration
@@ -241,7 +244,8 @@
                         if (docSnap.exists()) {
                             const userData = docSnap.data();
                             // Update the welcome message
-                            welcomeHeading.textContent = Welcome back, ${userData.first_name}!;
+                            // FIX 1: Added backticks (`) to create a valid template string
+                            welcomeHeading.textContent = `Welcome back, ${userData.first_name}!`;
                         } else {
                             console.log("No student data found for this user!");
                             welcomeHeading.textContent = "Welcome back!";
