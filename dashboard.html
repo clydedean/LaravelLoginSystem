@@ -241,7 +241,7 @@
                         if (docSnap.exists()) {
                             const userData = docSnap.data();
                             // Update the welcome message
-                            welcomeHeading.textContent = `Welcome back, ${userData.first_name}!`;
+                            welcomeHeading.textContent = Welcome back, ${userData.first_name}!;
                         } else {
                             console.log("No student data found for this user!");
                             welcomeHeading.textContent = "Welcome back!";
