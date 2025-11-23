@@ -1,1 +1,103 @@
-CREATE A SIMPLE LOGIN SYSTEM WITH SIMPLE DATABASE DATAS AND ONLY LOGOUT IN DASHBOARD BASED ON INSTRUCTIONS
+Student Information System (SIS) - Login & 2FA Portal by Team Villegas
+
+A secure, web-based student portal featuring user registration, email/password login, and 2-Factor Authentication (2FA) via SMS.
+
+
+🚀 Key Features
+
+
+Secure Sign Up: Captures student details (Name, ID, Age, Address, Birthdate) and securely creates an account.
+
+Duplicate ID Check: Prevents multiple accounts from using the same Student ID number.
+
+Data Storage: User profile data is stored in Cloud Firestore (NoSQL database).
+
+2-Factor Authentication: Verifies user identity via a real SMS code sent to their registered phone number using Firebase Phone Auth.
+
+Forgot Password: Allows users to reset their password via email link.
+
+Responsive Design: Fully rectangular, grid-based layout that adapts to mobile devices.
+
+
+
+🛠️ Tech Stack
+
+
+
+Frontend: HTML5, CSS3 (Inter Font), JavaScript (ES6 Modules)
+
+Backend (BaaS): Firebase Authentication, Cloud Firestore
+
+Hosting: Firebase Hosting (or Local Live Server for testing)
+
+
+
+📖 Usage Tutorial
+
+
+
+1. Prerequisites
+
+You do not need XAMPP, PHP, or MySQL running. This is a client-side app.
+
+A modern web browser (Chrome, Edge, Firefox).
+
+Internet connection (required for Firebase).
+
+VS Code with "Live Server" extension (recommended for local testing).
+
+2. Setup & Installation
+
+Clone or download this repository.
+
+Open the folder in VS Code.
+
+Right click login.html and select "Open with Live Server".
+
+3. How to Use
+
+Sign Up:
+
+Go to the Sign Up page.
+
+Fill in your details.
+
+Important: Enter a valid mobile number (e.g., 09123456789) in PH number. This will be used for 2FA.
+
+Click Sign Up. You will be redirected to Login.
+
+Log In:
+
+Enter your registered Email and Password.
+
+Click Sign In.
+
+2-Factor Verification:
+
+You will be redirected to the Verification page.
+
+Check your phone for a 6-digit SMS code.
+
+Note: If using a test number (see below), use the test code provided.
+
+Enter the code and click Verify.
+
+Dashboard:
+
+Upon success, you will access the Dashboard.
+
+
+
+⚠️ Important Dev Notes from Dean
+
+1. Limited Real SMS (10/day)
+
+Firebase's "Spark Plan" (Free Tier) has a strict limit on real SMS messages to prevent abuse.
+
+Limit: Approximately 10 SMS messages per day.
+
+Error: If you exceed this, you will see an error: quota-exceeded.
+
+Solution: For development testing, ALWAYS use Test Phone Numbers (see below).
+
+2. Im not using Real SMS for Testing!!! So its limited.

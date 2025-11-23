@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIS - 2-Factor Authentication</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.85rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #005A9C;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .btn:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+
+        #recaptcha-container {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .status-message {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #005A9C;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Verification</h1>
+        <p>We sent a code to your registered phone number.</p>
+
+        <div id="recaptcha-container"></div>
+
+        <form id="otp-form">
+            <div class="form-group">
+                <label for="otp">Enter 6-Digit Code</label>
+                <input type="text" id="otp" name="otp" maxlength="6" placeholder="123456" required>
+            </div>
+            <button type="submit" id="verify-button" class="btn">Verify Code</button>
+        </form>
+        
+        <div id="status-msg" class="status-message">Preparing to send code...</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+        import { 
+            getAuth, 
+            RecaptchaVerifier, 
+            signInWithPhoneNumber,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDznfAjZr9KvxhLL7kdEAaR5Ek-SmEDHFA",
+            authDomain: "laravelloginsystem-338f4.firebaseapp.com",
+            projectId: "laravelloginsystem-338f4",
+            storageBucket: "laravelloginsystem-338f4.firebasestorage.app",
+            messagingSenderId: "586919067493",
+            appId: "1:586919067493:web:4ca7a99bbaa8a7c20eeb8c",
+            measurementId: "G-REM2Z91GWT"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Need to set auth language
+        auth.languageCode = 'en';
+
+        const otpForm = document.getElementById('otp-form');
+        const verifyButton = document.getElementById('verify-button');
+        const statusMsg = document.getElementById('status-msg');
+
+        // Global confirmation result
+        window.confirmationResult = null;
+
+        // 1. Check user login status
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                statusMsg.textContent = "Fetching your phone number...";
+                
+                // 2. Get Phone Number from Firestore
+                try {
+                    const docRef = doc(db, "students", user.uid);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        let phone = docSnap.data().phone_number;
+                        
+                        // 3. Format Phone Number: 09... -> +639...
+                        if (phone && phone.startsWith('09')) {
+                            phone = '+63' + phone.substring(1);
+                        }
+                        
+                        console.log("Sending code to:", phone);
+                        sendOTP(phone);
+                    } else {
+                        alert("No phone number found! Contact admin.");
+                        window.location.href = "/login.html";
+                    }
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                    statusMsg.textContent = "Error fetching user data.";
+                }
+            } else {
+                // If not logged in, go back to login
+                window.location.href = "/login.html";
+            }
+        });
+
+        // 4. Setup Recaptcha and Send SMS
+        function sendOTP(phoneNumber) {
+            // Invisible Recaptcha
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    'size': 'invisible',
+                    'callback': (response) => {
+                        // reCAPTCHA solved, allow signInWithPhoneNumber.
+                    }
+                });
+            }
+
+            const appVerifier = window.recaptchaVerifier;
+
+            signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+                .then((result) => {
+                    // SMS sent
+                    window.confirmationResult = result;
+                    statusMsg.textContent = "Code sent! Check your phone.";
+                    console.log("SMS sent");
+                }).catch((error) => {
+                    console.error("SMS Error:", error);
+                    statusMsg.textContent = "Error sending SMS: " + error.message;
+                    // Reset recaptcha if error
+                    if(window.recaptchaVerifier) {
+                        window.recaptchaVerifier.render().then(function(widgetId) {
+                            grecaptcha.reset(widgetId);
+                        });
+                    }
+                });
+        }
+
+        // 5. Verify Code
+        otpForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const code = document.getElementById('otp').value;
+
+            if(!window.confirmationResult) {
+                statusMsg.textContent = "Please wait for code to be sent.";
+                return;
+            }
+
+            verifyButton.textContent = "Verifying...";
+            verifyButton.disabled = true;
+
+            window.confirmationResult.confirm(code).then((result) => {
+                // User signed in successfully.
+                console.log("2FA Success");
+                window.location.href = "/dashboard.html";
+            }).catch((error) => {
+                console.error("Verify Error:", error);
+                statusMsg.textContent = "Incorrect code. Please try again.";
+                verifyButton.textContent = "Verify Code";
+                verifyButton.disabled = false;
+            });
+        });
+
+    </script>
+</body>
+</html>

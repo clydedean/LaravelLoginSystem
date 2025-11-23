@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIS - Sign Up</title>
     <style>
-        /* Import Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         body {
@@ -17,6 +15,7 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            padding: 2rem 0;
         }
 
         .container {
@@ -25,9 +24,9 @@
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
             width: 100%;
-            max-width: 900px;
+            max-width: 850px; /* Rectangular/Wide Layout */
             box-sizing: border-box;
-            margin: 2rem 0;
+            margin: 0 1rem;
         }
 
         .logo-container {
@@ -53,19 +52,20 @@
             margin-bottom: 2rem;
         }
 
-        .form-row {
+        /* Grid Layout */
+        .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
             gap: 1.5rem;
-            margin-bottom: 1.25rem;
         }
 
         .form-group {
-            margin-bottom: 1.25rem;
+            margin-bottom: 0;
         }
 
-        .form-group-full {
-            grid-column: 1 / -1;
+        /* Special class for full-width items if needed later */
+        .full-width {
+            grid-column: span 2;
         }
 
         .form-group label {
@@ -110,11 +110,10 @@
             background-color: #004a80;
             transform: translateY(-2px);
         }
-
+        
         .btn:disabled {
             background-color: #aaa;
             cursor: not-allowed;
-            transform: translateY(0);
         }
 
         .login-link {
@@ -135,7 +134,6 @@
             text-decoration: underline;
         }
 
-        /* Error Message Styling */
         .error-message {
             display: none;
             background-color: #ffebee;
@@ -147,54 +145,18 @@
             text-align: left;
         }
 
-        /* Responsive Design */
-        @media (max-width: 1366px) {
-            .container {
-                max-width: 800px;
-                padding: 2rem;
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .container {
-                max-width: 700px;
-                padding: 1.75rem;
-            }
-        }
-
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .form-row {
+            .form-grid {
                 grid-template-columns: 1fr;
-                gap: 0;
+                gap: 1.25rem;
             }
-
-            .container {
-                max-width: 450px;
-                padding: 1.5rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 1.25rem;
-                margin: 1rem;
-            }
-
-            h1 {
-                font-size: 1.5rem;
-            }
-
-            .form-group input {
-                padding: 0.65rem;
-            }
-
-            .btn {
-                padding: 0.75rem;
+            .full-width {
+                grid-column: span 1;
             }
         }
     </style>
 </head>
-
 <body>
 
     <div class="container">
@@ -204,22 +166,11 @@
         <h1>Create Account</h1>
         <p>Student Information System</p>
 
-        <!-- Error message placeholder -->
         <div id="error-message-box" class="error-message"></div>
 
         <form id="signup-form">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="student_id">Student ID Number</label>
-                    <input type="text" id="student_id" name="student_id" required>
-                </div>
-                <div class="form-group">
-                    <label for="age">Age</label>
-                    <input type="number" id="age" name="age" required>
-                </div>
-            </div>
-
-            <div class="form-row">
+            <div class="form-grid">
+                <!-- Row 1: Names (Above ID/Age) -->
                 <div class="form-group">
                     <label for="first_name">First Name</label>
                     <input type="text" id="first_name" name="first_name" required>
@@ -228,23 +179,45 @@
                     <label for="last_name">Last Name</label>
                     <input type="text" id="last_name" name="last_name" required>
                 </div>
-            </div>
 
-            <div class="form-row">
-                <div class="form-group form-group-full">
+                <!-- Row 2: ID and Age -->
+                <div class="form-group">
+                    <label for="student_id">Student ID Number</label>
+                    <input type="text" id="student_id" name="student_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" required>
+                </div>
+
+                <!-- Row 3: Address and Birthdate -->
+                <div class="form-group">
                     <label for="address">Address</label>
                     <input type="text" id="address" name="address">
                 </div>
-            </div>
+                <div class="form-group">
+                    <label for="birthdate">Date of Birth</label>
+                    <input type="date" id="birthdate" name="birthdate" required>
+                </div>
 
-            <div class="form-row">
+                <!-- Row 4: Email and Phone -->
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Password (Min. 6 characters)</label>
+                    <label for="phone_number">Phone Number (09XXXXXXXXX)</label>
+                    <input type="tel" id="phone_number" name="phone_number" placeholder="09123456789" required maxlength="11">
+                </div>
+                
+                <!-- Row 5: Password and Confirm -->
+                <div class="form-group">
+                    <label for="password">Password (Min. 6 chars)</label>
                     <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
                 </div>
             </div>
 
@@ -256,22 +229,24 @@
         </div>
     </div>
 
-    <!-- ========= FIREBASE SCRIPT ========== -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-        // Import Authentication and Firestore
-        import {
-            getAuth,
-            createUserWithEmailAndPassword
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword,
+            signOut // <--- Added signOut here
         } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-        import {
-            getFirestore,
-            doc,
-            setDoc
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc,
+            collection,
+            query,
+            where,
+            getDocs
         } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
+        // Replace with your config
         const firebaseConfig = {
             apiKey: "AIzaSyDznfAjZr9KvxhLL7kdEAaR5Ek-SmEDHFA",
             authDomain: "laravelloginsystem-338f4.firebaseapp.com",
@@ -282,85 +257,102 @@
             measurementId: "G-REM2Z91GWT"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        // Initialize Firebase Services
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Get elements
         const signupForm = document.getElementById('signup-form');
         const signupButton = document.getElementById('signup-button');
         const errorBox = document.getElementById('error-message-box');
 
-        // Add event listener to the form
-        signupForm.addEventListener('submit', (e) => {
+        signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            // Get all form values
+            
             const student_id = signupForm.student_id.value;
             const first_name = signupForm.first_name.value;
             const last_name = signupForm.last_name.value;
             const age = signupForm.age.value;
             const address = signupForm.address.value;
+            const birthdate = signupForm.birthdate.value;
             const email = signupForm.email.value;
+            const phone_number = signupForm.phone_number.value;
             const password = signupForm.password.value;
-
-            // Validation
-            if (!student_id || !first_name || !last_name || !age || !email || !password) {
-                showError("Please fill in all required fields.");
+            const confirm_password = signupForm.confirm_password.value;
+            
+            // --- VALIDATION ---
+            
+            if (password !== confirm_password) {
+                showError("Passwords do not match!");
                 return;
             }
+
             if (password.length < 6) {
                 showError("Password must be at least 6 characters long.");
                 return;
             }
 
-            // Disable button
+            if (!birthdate) {
+                showError("Please select your Date of Birth.");
+                return;
+            }
+
+            // Logic: Check if starts with 09 and is 11 digits
+            const phoneRegex = /^09\d{9}$/;
+            if (!phoneRegex.test(phone_number)) {
+                showError("Invalid Phone Number. It must start with '09' and contain 11 digits.");
+                return;
+            }
+
             signupButton.disabled = true;
-            signupButton.textContent = "Signing up...";
+            signupButton.textContent = "Checking ID...";
 
-            // Create the user in Firebase Auth
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
+            try {
+                // Duplicate ID Check Logic
+                const studentsRef = collection(db, "students");
+                const q = query(studentsRef, where("student_id", "==", student_id));
+                const querySnapshot = await getDocs(q);
 
-                    // Save the extra data to Firestore
-                    const userDocRef = doc(db, "students", user.uid);
-
-                    setDoc(userDocRef, {
-                        student_id: student_id,
-                        first_name: first_name,
-                        last_name: last_name,
-                        age: parseInt(age),
-                        address: address,
-                        email: email
-                    })
-                        .then(() => {
-                            console.log("User created and data saved!");
-                            window.location.href = "login.html";
-                        })
-                        .catch((error) => {
-                            showError("Error saving student data: " + error.message);
-                            signupButton.disabled = false;
-                            signupButton.textContent = "Sign Up";
-                        });
-
-                })
-                .catch((error) => {
-                    showError(error.message);
+                if (!querySnapshot.empty) {
+                    showError("This Student ID Number is already registered!");
                     signupButton.disabled = false;
                     signupButton.textContent = "Sign Up";
-                });
-        });
+                    return;
+                }
 
+                signupButton.textContent = "Creating Account...";
+
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Save Data to Firestore
+                await setDoc(doc(db, "students", user.uid), {
+                    student_id: student_id,
+                    first_name: first_name,
+                    last_name: last_name,
+                    age: parseInt(age),
+                    address: address,
+                    birthdate: birthdate,
+                    email: email,
+                    phone_number: phone_number
+                });
+
+                // Force Logout after Signup
+                await signOut(auth); 
+
+                console.log("User created and data saved! User logged out for 2FA.");
+                window.location.href = "/login.html";
+
+            } catch (error) {
+                showError(error.message);
+                signupButton.disabled = false;
+                signupButton.textContent = "Sign Up";
+            }
+        });
+        
         function showError(message) {
             errorBox.style.display = 'block';
             errorBox.textContent = message;
         }
-
     </script>
-
 </body>
-
-</html>
+</html> 
