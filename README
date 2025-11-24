@@ -68,7 +68,7 @@ Step 1: You enter your Email AND Password.
 
 Step 2: Firebase checks if the password is correct.
 
-Step 3: If the password is correct, it sends the Magic Link to your email (and temporarily logs you out to ensure security).
+Step 3: If the password is correct, it sends the Magic Link to your email, if not in inbox CHECK SPAM FOLDER.
 
 Step 4: You click the link in your email -> You get redirected to the Dashboard.
 
