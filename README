@@ -1,10 +1,8 @@
 Student Information System (SIS) - Login & 2FA Portal by Team Villegas
 
-A secure, web-based student portal featuring user registration, email/password login, and 2-Factor Authentication (2FA) via SMS.
-
+A secure, web-based student portal featuring user registration, email/password login, and 2-Factor Authentication (2FA) via email verification.
 
 🚀 Key Features
-
 
 Secure Sign Up: Captures student details (Name, ID, Age, Address, Birthdate) and securely creates an account.
 
@@ -18,11 +16,7 @@ Forgot Password: Allows users to reset their password via email link.
 
 Responsive Design: Fully rectangular, grid-based layout that adapts to mobile devices.
 
-
-
 🛠️ Tech Stack
-
-
 
 Frontend: HTML5, CSS3 (Inter Font), JavaScript (ES6 Modules)
 
@@ -30,11 +24,7 @@ Backend (BaaS): Firebase Authentication, Cloud Firestore
 
 Hosting: Firebase Hosting (or Local Live Server for testing)
 
-
-
 📖 Usage Tutorial
-
-
 
 1. Prerequisites
 
@@ -62,7 +52,7 @@ Go to the Sign Up page.
 
 Fill in your details.
 
-Important: Enter a valid mobile number (e.g., 09123456789) in PH number. This will be used for 2FA.
+Important: Enter a valid email address. This will be used for 2FA email verification.
 
 Click Sign Up. You will be redirected to Login.
 
@@ -72,32 +62,22 @@ Enter your registered Email and Password.
 
 Click Sign In.
 
-2-Factor Verification:
+Magic Link Verification Usage in Firebase:
 
-You will be redirected to the Verification page.
+Step 1: You enter your Email AND Password.
 
-Check your phone for a 6-digit SMS code.
+Step 2: Firebase checks if the password is correct.
 
-Note: If using a test number (see below), use the test code provided.
+Step 3: If the password is correct, it sends the Magic Link to your email (and temporarily logs you out to ensure security).
 
-Enter the code and click Verify.
-
-Dashboard:
-
-Upon success, you will access the Dashboard.
+Step 4: You click the link in your email -> You get redirected to the Dashboard.
 
 
+⚠️ Important Dev Notes from Deancv
 
-⚠️ Important Dev Notes from Dean
+FIREBASE SMS IS PAID AND CANT BE USED HERE, INSTEAD IM USING AN EMAIL VERIFICATION.
+Firebase does NOT support "Email OTP" (sending a 123456 code to email) natively.
 
-1. Limited Real SMS (10/day)
+To achieve "2FA for every login" using Firebase's free tier is actually the Time-based One-Time Password (TOTP) feature (like Google Authenticator), but that requires an app.
 
-Firebase's "Spark Plan" (Free Tier) has a strict limit on real SMS messages to prevent abuse.
-
-Limit: Approximately 10 SMS messages per day.
-
-Error: If you exceed this, you will see an error: quota-exceeded.
-
-Solution: For development testing, ALWAYS use Test Phone Numbers (see below).
-
-2. Im not using Real SMS for Testing!!! So its limited.
+Recommended Workaround (The "Magic Link" flow) will be implemented.

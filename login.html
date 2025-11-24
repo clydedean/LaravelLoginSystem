@@ -119,7 +119,6 @@
             text-decoration: underline;
         }
 
-        /* Forgot Password Link */
         .forgot-password {
             text-align: right;
             margin-bottom: 1.25rem;
@@ -146,6 +145,17 @@
             margin-bottom: 1.5rem;
             text-align: center;
         }
+
+        .success-message {
+            display: none;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -155,26 +165,27 @@
             <img src="images/logo.png" alt="School Logo">
         </div>
         <h1>Student Login</h1>
-        <p>Student Information System</p>
+        <p>Enter your credentials to receive a login link.</p>
 
         <div id="error-message-box" class="error-message"></div>
+        <div id="success-message-box" class="success-message"></div>
 
         <form id="login-form">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required>
             </div>
+            <!-- Password Field -->
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            
-            <!-- Link to Forgot Password Page -->
+
             <div class="forgot-password">
                 <a href="forgot_password.html">Forgot Password?</a>
             </div>
-
-            <button type="submit" id="login-button" class="btn">Sign In</button>
+            
+            <button type="submit" id="login-button" class="btn">Verify & Send Link</button>
         </form>
 
         <div class="signup-link">
@@ -186,8 +197,12 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
         import { 
             getAuth, 
-            signInWithEmailAndPassword,
-            onAuthStateChanged
+            signInWithEmailAndPassword, 
+            sendSignInLinkToEmail,     
+            isSignInWithEmailLink,     
+            signInWithEmailLink,       
+            onAuthStateChanged,
+            signOut
         } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -206,21 +221,40 @@
         const loginForm = document.getElementById('login-form');
         const loginButton = document.getElementById('login-button');
         const errorBox = document.getElementById('error-message-box');
+        const successBox = document.getElementById('success-message-box');
 
+        // FLAG to prevent auto-redirect during the login process
+        let loginInProgress = false;
+
+        // 1. HANDLE INCOMING MAGIC LINK (Part 2 of Login)
+        if (isSignInWithEmailLink(auth, window.location.href)) {
+            let email = window.localStorage.getItem('emailForSignIn');
+            
+            if (!email) {
+                email = window.prompt('Please confirm your email for login:');
+            }
+
+            signInWithEmailLink(auth, email, window.location.href)
+                .then((result) => {
+                    window.localStorage.removeItem('emailForSignIn');
+                    window.location.href = "/dashboard.html";
+                })
+                .catch((error) => {
+                    showError("Link Error: " + error.message);
+                });
+        }
+
+        // 2. Check Login Status
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User is logged in.
-                console.log("User already logged in. Redirecting...");
-                // If they are already logged in, they likely finished 2FA or skipped it.
-                // You can decide if this goes to dashboard or 2FA.
-                // For now, dashboard is standard if they have a session.
+            // Only redirect if logged in AND not processing a magic link AND not in the middle of our form submit
+            if (user && !isSignInWithEmailLink(auth, window.location.href) && !loginInProgress) {
                 window.location.href = "/dashboard.html";
             }
         });
 
+        // 3. HANDLE FORM SUBMIT (Part 1 of Login)
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault(); 
-            
             const email = loginForm.email.value;
             const password = loginForm.password.value;
             
@@ -229,26 +263,63 @@
                 return;
             }
             
-            loginButton.disabled = true;
-            loginButton.textContent = "Signing in...";
+            // SET FLAG TO TRUE to stop onAuthStateChanged from redirecting us
+            loginInProgress = true; 
             
+            loginButton.disabled = true;
+            loginButton.textContent = "Verifying Credentials...";
+            
+            // Step A: Verify Password first
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
-                    const user = userCredential.user;
-                    console.log("Login successful!", user.uid);
-                    // REDIRECT TO 2FA
-                    window.location.href = "/2fa.html";
+                    // Password is correct!
+                    
+                    // Step B: Send the Magic Link for 2FA
+                    const actionCodeSettings = {
+                        url: window.location.href, // Redirect back to this page
+                        handleCodeInApp: true
+                    };
+
+                    sendSignInLinkToEmail(auth, email, actionCodeSettings)
+                        .then(() => {
+                            window.localStorage.setItem('emailForSignIn', email);
+                            
+                            // Step C: Force Logout immediately!
+                            // This ensures they are NOT "logged in" until they click the email link.
+                            signOut(auth).then(() => {
+                                loginInProgress = false; // Reset flag
+                            });
+
+                            showSuccess("Password correct! We sent a secure link to your email. Click it to finish logging in.");
+                            loginButton.textContent = "Link Sent";
+                            // Hide form to prevent re-submission
+                            loginForm.style.display = 'none';
+                        })
+                        .catch((error) => {
+                            showError("Error sending link: " + error.message);
+                            loginButton.disabled = false;
+                            loginInProgress = false;
+                        });
                 })
                 .catch((error) => {
+                    // Password was wrong
                     showError("Invalid email or password.");
                     loginButton.disabled = false;
-                    loginButton.textContent = "Sign In";
+                    loginButton.textContent = "Verify & Send Link";
+                    loginInProgress = false;
                 });
         });
         
         function showError(message) {
             errorBox.style.display = 'block';
             errorBox.textContent = message;
+            successBox.style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            successBox.style.display = 'block';
+            successBox.textContent = message;
+            errorBox.style.display = 'none';
         }
     </script>
 

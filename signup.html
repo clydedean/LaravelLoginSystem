@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIS - Sign Up</title>
+    <!--I added comprehensive comments for understanding sir.-->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -24,7 +25,7 @@
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
             width: 100%;
-            max-width: 850px; /* Rectangular/Wide Layout */
+            max-width: 850px; /* Wide rectangular layout */
             box-sizing: border-box;
             margin: 0 1rem;
         }
@@ -234,7 +235,8 @@
         import { 
             getAuth, 
             createUserWithEmailAndPassword,
-            signOut // <--- Added signOut here
+            signOut,
+            sendEmailVerification // <--- Import Email Verification
         } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
         import { 
             getFirestore, 
@@ -336,10 +338,14 @@
                     phone_number: phone_number
                 });
 
-                // Force Logout after Signup
+                // SEND EMAIL VERIFICATION
+                await sendEmailVerification(user);
+
+                // Force Logout after Signup so they can't login until verified
                 await signOut(auth); 
 
-                console.log("User created and data saved! User logged out for 2FA.");
+                alert("Account created! We have sent a verification email to " + email + ". Please check your inbox and verify your account before logging in.");
+                
                 window.location.href = "/login.html";
 
             } catch (error) {
@@ -355,4 +361,4 @@
         }
     </script>
 </body>
-</html> 
+</html>
