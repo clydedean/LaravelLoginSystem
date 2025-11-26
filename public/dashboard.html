@@ -14,13 +14,11 @@
             margin: 0;
             padding: 0;
             display: flex;
-            height: 100vh; /* Full viewport height for desktop */
-            /* Show a loading text until Firebase checks auth */
+            height: 100vh;
             color: #333;
-            overflow: hidden; /* Prevent body scroll on desktop (content scrolls internally) */
+            overflow: hidden; 
         }
         
-        /* Loading state */
         body.loading::before {
             content: "Loading Student Portal...";
             font-size: 1.5rem;
@@ -30,6 +28,45 @@
             transform: translate(-50%, -50%);
         }
 
+        /* --- HAMBURGER BUTTON (Hidden on Desktop) --- */
+        .hamburger-btn {
+            display: none;
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 200; /* Above content */
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .hamburger-btn svg {
+            width: 30px;
+            height: 30px;
+            color: #333;
+        }
+
+        /* --- OVERLAY (Hidden by default) --- */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 900; /* Below sidebar, above content */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* --- SIDEBAR --- */
         .sidebar {
             width: 260px;
             background-color: #004a80;
@@ -39,7 +76,8 @@
             padding: 1.5rem;
             box-sizing: border-box;
             flex-shrink: 0;
-            transition: all 0.3s ease; /* Smooth transition for resizing */
+            transition: transform 0.3s ease;
+            z-index: 1000; /* High z-index to sit on top on mobile */
         }
 
         .sidebar-header {
@@ -48,6 +86,7 @@
             text-align: center;
             margin-bottom: 2rem;
             color: #ffffff;
+            /* Add padding top on mobile so header isn't hidden by status bars etc */
         }
 
         .sidebar-nav {
@@ -78,7 +117,6 @@
             color: #ffffff;
         }
         
-        /* Make logout button look different */
         .sidebar-nav a#logout-button {
             color: #ffcdd2;
         }
@@ -94,16 +132,19 @@
             opacity: 0.8;
         }
 
+        /* --- MAIN CONTENT --- */
         .main-content {
             flex-grow: 1;
             padding: 2.5rem;
             box-sizing: border-box;
-            overflow-y: auto; /* Allows content to scroll independently */
+            overflow-y: auto;
+            position: relative;
+            transition: margin-left 0.3s ease;
         }
         
-        /* Hide sidebar and main content while loading */
         .loading .sidebar,
-        .loading .main-content {
+        .loading .main-content,
+        .loading .hamburger-btn {
             display: none;
         }
 
@@ -113,7 +154,8 @@
             align-items: center;
             margin-bottom: 2rem;
         }
-
+        
+        /* Indent header slightly on desktop/mobile to account for spacing */
         .content-header h1 {
             font-size: 2rem;
             font-weight: 700;
@@ -145,63 +187,55 @@
         /* ========================================= */
         @media screen and (max-width: 768px) {
             body {
-                flex-direction: column; /* Stack Sidebar on TOP of Content */
-                height: auto; /* Allow full page scrolling */
-                overflow: visible;
+                display: block; /* Switch from flex to block for positioning */
+                overflow-x: hidden;
             }
 
+            /* Show Hamburger */
+            .hamburger-btn {
+                display: block;
+            }
+
+            /* Sidebar becomes a drawer */
             .sidebar {
-                width: 100%; /* Full width */
-                padding: 1rem;
-                height: auto;
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: 280px;
+                transform: translateX(-100%); /* Hide off-screen left */
+                box-shadow: 4px 0 15px rgba(0,0,0,0.1);
             }
 
-            .sidebar-header {
-                margin-bottom: 1rem;
-                font-size: 1.25rem;
-                display: flex;
-                justify-content: center;
-                align-items: center;
+            /* Class to slide it in */
+            .sidebar.active {
+                transform: translateX(0);
             }
 
-            .sidebar-nav {
-                display: flex;       /* Turn list into a horizontal row */
-                flex-wrap: wrap;     /* Allow items to wrap if screen is very small */
-                justify-content: center;
-                gap: 0.5rem;         /* Space between buttons */
-            }
-
-            .sidebar-nav li {
-                margin-bottom: 0;
-                flex: 1 1 auto;      /* Buttons grow to fill space */
-                min-width: 100px;    /* Minimum button width */
-            }
-
-            .sidebar-nav a {
-                justify-content: center; /* Center text inside buttons */
-                padding: 0.6rem;
-                font-size: 0.9rem;
-            }
-
-            .sidebar-nav a svg {
-                margin-right: 0.5rem;
-                width: 18px;
-                height: 18px;
-            }
-
+            /* Adjust Main Content */
             .main-content {
-                padding: 1.5rem; /* Reduce padding on mobile */
-                height: auto;
-                overflow-y: visible;
+                padding: 1.5rem;
+                padding-top: 5rem; /* Make room for the hamburger button */
+                height: 100vh;
             }
 
             .content-header h1 {
-                font-size: 1.5rem; /* Smaller heading */
+                font-size: 1.75rem;
             }
         }
     </style>
 </head>
-<body class="loading"> <div class="sidebar">
+<body class="loading">
+
+    <button id="hamburger-btn" class="hamburger-btn" aria-label="Open Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+
+    <div id="overlay" class="overlay"></div>
+
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             SIS Portal
         </div>
@@ -284,25 +318,33 @@
         const welcomeHeading = document.getElementById('welcome-heading');
         const body = document.querySelector('body');
 
-        // --- This replaces the PHP session check ---
+        // --- Hamburger Logic ---
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        function toggleMenu() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        hamburgerBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu); // Close when clicking outside
+
+        // --- Auth Logic ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in.
                 console.log("User is logged in:", user.uid);
                 
-                // Now, get the user's data from Firestore
                 const userDocRef = doc(db, "students", user.uid);
                 getDoc(userDocRef)
                     .then((docSnap) => {
                         if (docSnap.exists()) {
                             const userData = docSnap.data();
-                            // Update the welcome message
                             welcomeHeading.textContent = `Welcome back, ${userData.first_name}!`;
                         } else {
-                            console.log("No student data found for this user!");
                             welcomeHeading.textContent = "Welcome back!";
                         }
-                        // Show the page content
                         body.classList.remove('loading');
                     })
                     .catch((error) => {
@@ -312,18 +354,14 @@
                     });
 
             } else {
-                // User is signed out. Redirect to login.
                 console.log("No user logged in. Redirecting to login...");
                 window.location.href = "/login.html";
             }
         });
 
-        // --- This replaces logout.php ---
         logoutButton.addEventListener('click', (e) => {
             e.preventDefault();
-            
             signOut(auth).then(() => {
-                // Sign-out successful.
                 console.log("User logged out.");
                 window.location.href = "/login.html";
             }).catch((error) => {
