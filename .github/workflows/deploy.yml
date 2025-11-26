@@ -16,6 +16,7 @@ jobs:
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERgitVICE_ACCOUNT_LARAVELLOGINSYSTEM_338F4 }}'
+          # IMPORTANT: This secret is created automatically when you run 'firebase init hosting:github'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LARAVELLOGINSYSTEM_338F4 }}'
           channelId: live
           projectId: laravelloginsystem-338f4
