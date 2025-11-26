@@ -236,7 +236,7 @@
             getAuth, 
             createUserWithEmailAndPassword,
             signOut,
-            sendEmailVerification // <--- Import Email Verification
+            sendEmailVerification
         } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
         import { 
             getFirestore, 
@@ -248,7 +248,6 @@
             getDocs
         } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
-        // Replace with your config
         const firebaseConfig = {
             apiKey: "AIzaSyDznfAjZr9KvxhLL7kdEAaR5Ek-SmEDHFA",
             authDomain: "laravelloginsystem-338f4.firebaseapp.com",
@@ -282,7 +281,6 @@
             const confirm_password = signupForm.confirm_password.value;
             
             // --- VALIDATION ---
-            
             if (password !== confirm_password) {
                 showError("Passwords do not match!");
                 return;
@@ -326,7 +324,7 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                // Save Data to Firestore
+                // Save Data to Firestore (including phone for 2FA)
                 await setDoc(doc(db, "students", user.uid), {
                     student_id: student_id,
                     first_name: first_name,
@@ -338,13 +336,13 @@
                     phone_number: phone_number
                 });
 
-                // SEND EMAIL VERIFICATION
+                // Send Verification Email
                 await sendEmailVerification(user);
 
-                // Force Logout after Signup so they can't login until verified
+                // Force Logout so they must verify email and do 2FA on login
                 await signOut(auth); 
 
-                alert("Account created! We have sent a verification email to " + email + ". Please check your inbox and verify your account before logging in.");
+                alert("Account created! Please verify your email address. A verification link has been sent to " + email);
                 
                 window.location.href = "/login.html";
 

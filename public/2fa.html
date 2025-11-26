@@ -16,7 +16,6 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            /* CRITICAL FOR MOBILE: Adds space around the card on small screens */
             padding: 1rem; 
             box-sizing: border-box;
         }
@@ -36,7 +35,7 @@
             color: #333;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            font-size: 1.75rem; /* Slightly smaller for better fit */
+            font-size: 1.75rem; 
         }
 
         p {
@@ -55,7 +54,7 @@
             margin-bottom: 0.5rem;
             color: #555;
             font-weight: 500;
-            text-align: center; /* Center label for OTP context */
+            text-align: center; 
         }
 
         .form-group input {
@@ -110,20 +109,16 @@
             margin-top: 1rem;
             font-size: 0.9rem;
             color: #005A9C;
-            min-height: 1.5em; /* Prevents jumping when text appears */
+            min-height: 1.5em; 
         }
 
-        /* --- RESPONSIVE TWEAKS --- */
         @media screen and (max-width: 480px) {
             .container {
-                padding: 1.5rem; /* Less padding gives the input more room */
+                padding: 1.5rem; 
             }
-            
             h1 {
                 font-size: 1.5rem;
             }
-            
-            /* Ensure the input text doesn't get cut off on tiny screens */
             .form-group input {
                 font-size: 1.1rem;
                 letter-spacing: 3px;
@@ -217,7 +212,7 @@
                     statusMsg.textContent = "Error fetching user data.";
                 }
             } else {
-                // If not logged in, go back to login
+                // If not logged in (from login page), go back
                 window.location.href = "/login.html";
             }
         });

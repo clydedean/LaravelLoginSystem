@@ -165,16 +165,12 @@
         }
 
         /* --- RESPONSIVE MEDIA QUERIES --- */
-        
-        /* For Mobile Phones (Screen width less than 480px) */
         @media screen and (max-width: 480px) {
             .container {
-                /* Reduce padding to give content more room */
                 padding: 1.5rem; 
             }
 
             h1 {
-                /* Slightly smaller header to prevent wrapping */
                 font-size: 1.75rem; 
             }
             
@@ -182,11 +178,9 @@
                 margin-bottom: 1.5rem;
             }
 
-            /* Adjust body alignment for very short screens (landscape) */
             body {
-               /* This ensures if the phone is horizontal, you can scroll */
                min-height: auto; 
-               padding: 1rem 0; /* Add top/bottom padding for scrolling space */
+               padding: 1rem 0;
             }
         }
     </style>
@@ -198,27 +192,25 @@
             <img src="images/logo.png" alt="School Logo">
         </div>
         <h1>Student Login</h1>
-        <p>Enter your credentials to receive a login link.</p>
+        <p>Student Information System</p>
 
         <div id="error-message-box" class="error-message"></div>
-        <div id="success-message-box" class="success-message"></div>
 
         <form id="login-form">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required>
             </div>
-            <!-- Password Field -->
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-
+            
             <div class="forgot-password">
                 <a href="forgot_password.html">Forgot Password?</a>
             </div>
-            
-            <button type="submit" id="login-button" class="btn">Verify & Send Link</button>
+
+            <button type="submit" id="login-button" class="btn">Sign In</button>
         </form>
 
         <div class="signup-link">
@@ -230,10 +222,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
         import { 
             getAuth, 
-            signInWithEmailAndPassword, 
-            sendSignInLinkToEmail,     
-            isSignInWithEmailLink,     
-            signInWithEmailLink,       
+            signInWithEmailAndPassword,
             onAuthStateChanged,
             signOut
         } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
@@ -254,40 +243,24 @@
         const loginForm = document.getElementById('login-form');
         const loginButton = document.getElementById('login-button');
         const errorBox = document.getElementById('error-message-box');
-        const successBox = document.getElementById('success-message-box');
 
-        // FLAG to prevent auto-redirect during the login process
-        let loginInProgress = false;
-
-        // 1. HANDLE INCOMING MAGIC LINK (Part 2 of Login)
-        if (isSignInWithEmailLink(auth, window.location.href)) {
-            let email = window.localStorage.getItem('emailForSignIn');
-            
-            if (!email) {
-                email = window.prompt('Please confirm your email for login:');
-            }
-
-            signInWithEmailLink(auth, email, window.location.href)
-                .then((result) => {
-                    window.localStorage.removeItem('emailForSignIn');
-                    window.location.href = "/dashboard.html";
-                })
-                .catch((error) => {
-                    showError("Link Error: " + error.message);
-                });
-        }
-
-        // 2. Check Login Status
+        // Check user status on load
         onAuthStateChanged(auth, (user) => {
-            // Only redirect if logged in AND not processing a magic link AND not in the middle of our form submit
-            if (user && !isSignInWithEmailLink(auth, window.location.href) && !loginInProgress) {
-                window.location.href = "/dashboard.html";
+            if (user) {
+                if (user.emailVerified) {
+                    // If verifying email is done, go to 2FA
+                    console.log("User verified. Redirecting to 2FA...");
+                    window.location.href = "/2fa.html";
+                } else {
+                    // Logged in but not verified. Stay here.
+                    console.log("User logged in but email not verified.");
+                }
             }
         });
 
-        // 3. HANDLE FORM SUBMIT (Part 1 of Login)
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault(); 
+            
             const email = loginForm.email.value;
             const password = loginForm.password.value;
             
@@ -296,63 +269,37 @@
                 return;
             }
             
-            // SET FLAG TO TRUE to stop onAuthStateChanged from redirecting us
-            loginInProgress = true; 
-            
             loginButton.disabled = true;
-            loginButton.textContent = "Verifying Credentials...";
+            loginButton.textContent = "Signing in...";
             
-            // Step A: Verify Password first
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
-                    // Password is correct!
-                    
-                    // Step B: Send the Magic Link for 2FA
-                    const actionCodeSettings = {
-                        url: window.location.href, // Redirect back to this page
-                        handleCodeInApp: true
-                    };
+                    const user = userCredential.user;
 
-                    sendSignInLinkToEmail(auth, email, actionCodeSettings)
-                        .then(() => {
-                            window.localStorage.setItem('emailForSignIn', email);
-                            
-                            // Step C: Force Logout immediately!
-                            // This ensures they are NOT "logged in" until they click the email link.
-                            signOut(auth).then(() => {
-                                loginInProgress = false; // Reset flag
-                            });
-
-                            showSuccess("Password correct! We sent a secure link to your email. Click it to finish logging in.");
-                            loginButton.textContent = "Link Sent";
-                            // Hide form to prevent re-submission
-                            loginForm.style.display = 'none';
-                        })
-                        .catch((error) => {
-                            showError("Error sending link: " + error.message);
-                            loginButton.disabled = false;
-                            loginInProgress = false;
-                        });
+                    // CHECK EMAIL VERIFICATION
+                    if (user.emailVerified) {
+                        console.log("Login successful!", user.uid);
+                        // REDIRECT TO 2FA (Not Dashboard)
+                        window.location.href = "/2fa.html";
+                    } else {
+                        // Email is NOT verified -> Block login
+                        showError("Please verify your email address first. Check your inbox.");
+                        // We don't necessarily force logout here so they can see the state, 
+                        // but you could if you wanted strictness.
+                        loginButton.disabled = false;
+                        loginButton.textContent = "Sign In";
+                    }
                 })
                 .catch((error) => {
-                    // Password was wrong
                     showError("Invalid email or password.");
                     loginButton.disabled = false;
-                    loginButton.textContent = "Verify & Send Link";
-                    loginInProgress = false;
+                    loginButton.textContent = "Sign In";
                 });
         });
         
         function showError(message) {
             errorBox.style.display = 'block';
             errorBox.textContent = message;
-            successBox.style.display = 'none';
-        }
-
-        function showSuccess(message) {
-            successBox.style.display = 'block';
-            successBox.textContent = message;
-            errorBox.style.display = 'none';
         }
     </script>
 
