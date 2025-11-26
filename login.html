@@ -14,6 +14,9 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            /* Added padding to body prevents the card from touching the edges on mobile */
+            padding: 1rem; 
+            box-sizing: border-box; 
             margin: 0;
         }
 
@@ -24,7 +27,8 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
             width: 100%;
             max-width: 400px;
-            box-sizing: border-box;
+            /* Ensure padding doesn't add to width */
+            box-sizing: border-box; 
         }
 
         .logo-container {
@@ -42,12 +46,15 @@
             color: #333;
             font-weight: 700;
             margin-bottom: 0.5rem;
+            /* Default font size */
+            font-size: 2rem; 
         }
 
         p {
             text-align: center;
             color: #666;
             margin-bottom: 2rem;
+            line-height: 1.5;
         }
 
         .form-group {
@@ -99,6 +106,7 @@
         .btn:disabled {
             background-color: #aaa;
             cursor: not-allowed;
+            transform: none;
         }
 
         .signup-link {
@@ -135,26 +143,51 @@
             text-decoration: underline;
         }
 
-        .error-message {
+        .error-message, .success-message {
             display: none; 
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .error-message {
             background-color: #ffebee;
             color: #c62828;
             border: 1px solid #ef9a9a;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            text-align: center;
         }
 
         .success-message {
-            display: none;
             background-color: #e8f5e9;
             color: #2e7d32;
             border: 1px solid #a5d6a7;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            text-align: center;
+        }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        
+        /* For Mobile Phones (Screen width less than 480px) */
+        @media screen and (max-width: 480px) {
+            .container {
+                /* Reduce padding to give content more room */
+                padding: 1.5rem; 
+            }
+
+            h1 {
+                /* Slightly smaller header to prevent wrapping */
+                font-size: 1.75rem; 
+            }
+            
+            p {
+                margin-bottom: 1.5rem;
+            }
+
+            /* Adjust body alignment for very short screens (landscape) */
+            body {
+               /* This ensures if the phone is horizontal, you can scroll */
+               min-height: auto; 
+               padding: 1rem 0; /* Add top/bottom padding for scrolling space */
+            }
         }
     </style>
 </head>

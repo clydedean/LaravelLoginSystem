@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - SIS</title>
-    <!--I added comprehensive comments for understanding sir.-->
     <style>
         /* Import Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -15,9 +14,10 @@
             margin: 0;
             padding: 0;
             display: flex;
-            height: 100vh;
+            height: 100vh; /* Full viewport height for desktop */
             /* Show a loading text until Firebase checks auth */
             color: #333;
+            overflow: hidden; /* Prevent body scroll on desktop (content scrolls internally) */
         }
         
         /* Loading state */
@@ -39,6 +39,7 @@
             padding: 1.5rem;
             box-sizing: border-box;
             flex-shrink: 0;
+            transition: all 0.3s ease; /* Smooth transition for resizing */
         }
 
         .sidebar-header {
@@ -97,7 +98,7 @@
             flex-grow: 1;
             padding: 2.5rem;
             box-sizing: border-box;
-            overflow-y: auto;
+            overflow-y: auto; /* Allows content to scroll independently */
         }
         
         /* Hide sidebar and main content while loading */
@@ -139,11 +140,68 @@
             line-height: 1.6;
         }
 
+        /* ========================================= */
+        /* RESPONSIVE DESIGN (Tablets & Mobile)      */
+        /* ========================================= */
+        @media screen and (max-width: 768px) {
+            body {
+                flex-direction: column; /* Stack Sidebar on TOP of Content */
+                height: auto; /* Allow full page scrolling */
+                overflow: visible;
+            }
+
+            .sidebar {
+                width: 100%; /* Full width */
+                padding: 1rem;
+                height: auto;
+            }
+
+            .sidebar-header {
+                margin-bottom: 1rem;
+                font-size: 1.25rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .sidebar-nav {
+                display: flex;       /* Turn list into a horizontal row */
+                flex-wrap: wrap;     /* Allow items to wrap if screen is very small */
+                justify-content: center;
+                gap: 0.5rem;         /* Space between buttons */
+            }
+
+            .sidebar-nav li {
+                margin-bottom: 0;
+                flex: 1 1 auto;      /* Buttons grow to fill space */
+                min-width: 100px;    /* Minimum button width */
+            }
+
+            .sidebar-nav a {
+                justify-content: center; /* Center text inside buttons */
+                padding: 0.6rem;
+                font-size: 0.9rem;
+            }
+
+            .sidebar-nav a svg {
+                margin-right: 0.5rem;
+                width: 18px;
+                height: 18px;
+            }
+
+            .main-content {
+                padding: 1.5rem; /* Reduce padding on mobile */
+                height: auto;
+                overflow-y: visible;
+            }
+
+            .content-header h1 {
+                font-size: 1.5rem; /* Smaller heading */
+            }
+        }
     </style>
 </head>
-<body class="loading"> <!-- Start in loading state -->
-
-    <div class="sidebar">
+<body class="loading"> <div class="sidebar">
         <div class="sidebar-header">
             SIS Portal
         </div>
@@ -162,7 +220,6 @@
             </li>
             <li>
                 <a href="#">
-                    <!-- FIX 3: Corrected the SVG URL from /2TEST/ to /2000/ -->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18" /></svg>
                     Subjects
                 </a>
@@ -173,9 +230,7 @@
                     Grades
                 </a>
             </li>
-        </ul>
-        <ul class="sidebar-nav"> <!-- Separate list for logout -->
-             <li>
+            <li>
                 <a href="#" id="logout-button">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                     Logout
@@ -196,9 +251,7 @@
         </div>
     </div>
 
-    <!-- ========= FIREBASE SCRIPT ========== -->
     <script type="module">
-        // FIX 2: Removed markdown [ ]( ) brackets from URL
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
         import { 
             getAuth, 
@@ -209,7 +262,6 @@
             getFirestore,
             doc,
             getDoc
-        // FIX 2: Removed markdown [ ]( ) brackets from URL
         } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
         // Your web app's Firebase configuration
@@ -245,7 +297,6 @@
                         if (docSnap.exists()) {
                             const userData = docSnap.data();
                             // Update the welcome message
-                            // FIX 1: Added backticks (`) to create a valid template string
                             welcomeHeading.textContent = `Welcome back, ${userData.first_name}!`;
                         } else {
                             console.log("No student data found for this user!");
@@ -263,7 +314,6 @@
             } else {
                 // User is signed out. Redirect to login.
                 console.log("No user logged in. Redirecting to login...");
-                // FIX: Use a root-relative path (starts with /)
                 window.location.href = "/login.html";
             }
         });
@@ -275,7 +325,6 @@
             signOut(auth).then(() => {
                 // Sign-out successful.
                 console.log("User logged out.");
-                // FIX: Use a root-relative path (starts with /)
                 window.location.href = "/login.html";
             }).catch((error) => {
                 console.error("Logout Error:", error);

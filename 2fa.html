@@ -16,6 +16,9 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            /* CRITICAL FOR MOBILE: Adds space around the card on small screens */
+            padding: 1rem; 
+            box-sizing: border-box;
         }
 
         .container {
@@ -33,11 +36,13 @@
             color: #333;
             font-weight: 700;
             margin-bottom: 0.5rem;
+            font-size: 1.75rem; /* Slightly smaller for better fit */
         }
 
         p {
             color: #666;
             margin-bottom: 2rem;
+            line-height: 1.5;
         }
 
         .form-group {
@@ -50,6 +55,7 @@
             margin-bottom: 0.5rem;
             color: #555;
             font-weight: 500;
+            text-align: center; /* Center label for OTP context */
         }
 
         .form-group input {
@@ -61,6 +67,14 @@
             font-size: 1.2rem;
             letter-spacing: 5px;
             text-align: center;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #005A9C;
+            box-shadow: 0 0 0 3px rgba(0, 90, 156, 0.1);
         }
 
         .btn {
@@ -74,6 +88,11 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #004a80;
         }
 
         .btn:disabled {
@@ -91,6 +110,24 @@
             margin-top: 1rem;
             font-size: 0.9rem;
             color: #005A9C;
+            min-height: 1.5em; /* Prevents jumping when text appears */
+        }
+
+        /* --- RESPONSIVE TWEAKS --- */
+        @media screen and (max-width: 480px) {
+            .container {
+                padding: 1.5rem; /* Less padding gives the input more room */
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            /* Ensure the input text doesn't get cut off on tiny screens */
+            .form-group input {
+                font-size: 1.1rem;
+                letter-spacing: 3px;
+            }
         }
     </style>
 </head>
